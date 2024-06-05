@@ -1,4 +1,4 @@
-import { Image, StatusBar, View } from "react-native";
+import { Alert, Image, StatusBar, View } from "react-native";
 
 import { Input } from "@/components/input";
 
@@ -8,9 +8,19 @@ import { colors } from "@/styles/colors";
 
 import { FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import { useState } from "react";
 
 export default function register() {
+  const [name, setName]  = useState("");
+  const  [email, setEmail]  = useState("");
+
+  function handlerRegister() {
+    if (!name.trim() || !email.trim()) {
+      return Alert.alert("Informações", "Preencha os campos!");
+    }
+    router.push("/ticket")
+  }
   return (
     <View className="flex-1 bg-green-500 items-center justify-center">
       <StatusBar barStyle="light-content" />
@@ -26,7 +36,7 @@ export default function register() {
             size={20}
             color={colors.green[200]}
           />
-          <Input.Field placeholder="Nome Completo" />
+          <Input.Field placeholder="Nome Completo" onChangeText={setName} />
         </Input>
         <Input>
           <MaterialIcons
@@ -34,9 +44,13 @@ export default function register() {
             size={20}
             color={colors.green[200]}
           />
-          <Input.Field placeholder="Email" keyboardType="email-address" />
+          <Input.Field
+            placeholder="Email"
+            keyboardType="email-address"
+            onChangeText={setEmail}
+          />
         </Input>
-        <Button title="Realizar inscrição0" />
+        <Button title="Realizar inscrição" onPress={() => handlerRegister()} />
 
         <Link
           href={"/"}
