@@ -1,0 +1,37 @@
+import AsyncStoge from "@react-native-async-storage/async-storage";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+
+export type BadgeStore = {
+  id: string;
+  name: string;
+  email: string;
+  eventTitle: string;
+  checkInURL: String;
+  image?: string;
+};
+
+type StateProps = {
+  data: BadgeStore | null;
+  save: (data: BadgeStore) => void;
+  updateAvatar: (uri: string) => void;
+  remove: () => void;
+};
+
+export const useBagdeStore = create(
+  persist<StateProps>(
+    (set) => ({
+      data: null,
+      save: (data: BadgeStore) => set(() => ({ data })),
+      remove: () => set(() => ({ data: null })),
+      updateAvatar: (uri: string) =>
+        set((state) => ({
+          data: state.data ? { ...state.data, image: uri } : state.data,
+        })),
+    }),
+    {
+      name: "nlw-unite:badge",
+      storage: createJSONStorage(() => AsyncStoge),
+    }
+  )
+);

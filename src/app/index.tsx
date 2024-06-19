@@ -8,17 +8,42 @@ import { colors } from "@/styles/colors";
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { Link } from "expo-router";
+import { Link, Redirect } from "expo-router";
 import { useState } from "react";
+
+import { api } from "@/server/api";
+import {useBagdeStore} from '@/store/badge-store'
+import { checkIn } from "../../Server/src/routes/check-in";
 
 export default function Home() {
   const [code, setCode] = useState("");
+  const [isLoading, setisLoading] = useState(false)
 
-  function handleAccessCredential() {
+  const bagdeStore = useBagdeStore()
+
+  async function handleAccessCredential() {
+    try{
     if (!code.trim()) {
       return Alert.alert("Ingresso", "Informe o código do ingresso!");
     }
+
+    setisLoading(true)
+
+    const {data} = await api.get(`/attendees/${code}/badge`)
+    
+    bagdeStore.save(data.badge)
+    
+    } catch(error){
+      console.log(error)
+      setisLoading(false)
+      Alert.alert("Ingresso", "Ingresso não encotrado")
+    }
   }
+
+  if(bagdeStore.data?.checkInURL){
+    return <Redirect href="/ticket"/>
+  }
+
 
   return (
     <View className="flex-1 bg-green-500 items-center justify-center">
@@ -43,6 +68,7 @@ export default function Home() {
         <Button
           title="Acessar Credencial"
           onPress={() => handleAccessCredential()}
+          isLoading={isLoading}
         />
 
         <Link
